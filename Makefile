@@ -39,3 +39,7 @@ flake8:
 mypy: export MYPYPATH=stubs
 mypy:
 	mypy cada_prio tests
+
+.PHONY: serve
+serve:
+	uvicorn cada_prio.rest_server:app --host 0.0.0.0 --port 8080 --reload

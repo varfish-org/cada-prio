@@ -7,3 +7,6 @@ tqdm >=4.0
 pronto >=2.5, <3.0
 networkx
 node2vec >=0.4.6, <0.5
+uvicon >=0.23.2
+fastapi >=0.103, <0.104
+python-dotenv >=1.0, <2.0
