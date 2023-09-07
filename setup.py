@@ -69,7 +69,7 @@ setup(
     ),
     test_suite="tests",
     tests_require=test_requirements,
-    url="https://github.com/bihealth/cada-ng",
+    url="https://github.com/bihealth/cada-prio",
     version=version,
     zip_safe=False,
 )

@@ -16,7 +16,7 @@ Types of Contributions
 Report Bugs
 ===========
 
-Report bugs at https://github.com/bihealth/cada-ng/issues.
+Report bugs at https://github.com/bihealth/cada-prio/issues.
 
 If you are reporting a bug, please include:
 
@@ -39,12 +39,12 @@ Anything tagged with "enhancement" and "help wanted" is open to whoever wants to
 Write Documentation
 ===================
 
-cada-ng could always use more documentation, whether as part of the official cada-ng docs, in docstrings, or even on the web in blog posts, articles, and such.
+cada-prio could always use more documentation, whether as part of the official cada-prio docs, in docstrings, or even on the web in blog posts, articles, and such.
 
 Submit Feedback
 ===============
 
-The best way to send feedback is to file an issue at https://github.com/bihealth/cada-ng/issues.
+The best way to send feedback is to file an issue at https://github.com/bihealth/cada-prio/issues.
 
 If you are proposing a feature:
 
@@ -56,18 +56,18 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `cada-ng` for local development.
+Ready to contribute? Here's how to set up `cada-prio` for local development.
 
-1. Fork the `cada-ng` repo on GitHub.
+1. Fork the `cada-prio` repo on GitHub.
 2. Clone your fork locally::
 
-    $ git clone git@github.com:bihealth/cada-ng.git
+    $ git clone git@github.com:bihealth/cada-prio.git
 
 3. Install your local copy into a virtualenv.
    Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
 
-    $ mkvirtualenv cada-ng
-    $ cd cada-ng/
+    $ mkvirtualenv cada-prio
+    $ cd cada-prio/
     $ python setup.py develop
 
 4. Create a branch for local development::
@@ -79,7 +79,7 @@ Ready to contribute? Here's how to set up `cada-ng` for local development.
 5. When you're done making changes, check that your changes pass flake8 and the
    tests, including testing other Python versions with tox::
 
-    $ flake8 cada-ng tests
+    $ flake8 cada-prio tests
     $ python setup.py test or pytest
     $ tox
 

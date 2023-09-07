@@ -6,7 +6,7 @@ set -x
 set -euo pipefail
 
 ORG=bihealth
-REPO=cada-ng
+REPO=cada-prio
 DOCKER_VERSION=${DOCKER_VERSION-adhoc}
 
 sudo docker build . \
