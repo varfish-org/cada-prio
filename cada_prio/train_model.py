@@ -216,20 +216,7 @@ class EmbeddingParams:
     workers: int = 4
 
 
-def run(
-    path_out: str,
-    path_hgnc_json: str,
-    path_gene_hpo_links: str,
-    path_hpo_genes_to_phenotype: str,
-    path_hpo_obo: str,
-):
-    # load all data
-    ncbi_to_hgnc, hgnc_info = load_hgnc_info(path_hgnc_json)
-    clinvar_gen2phen = load_clinvar_gen2phen(path_gene_hpo_links)
-    hpo_gen2phen = load_hpo_gen2phen(path_hpo_genes_to_phenotype, ncbi_to_hgnc)
-    hpo_ontology, hpo_id_from_alt, hpo_id_to_name = load_hpo_ontology(path_hpo_obo)
-    _, _, _, _ = hgnc_info, hpo_gen2phen, hpo_id_from_alt, hpo_id_to_name
-
+def build_and_fit_model(clinvar_gen2phen, hpo_ontology):
     # create graph edges combining HPO hierarchy and training edges from ClinVar
     logger.info("Constructing training graph ...")
     logger.info("- building edges ...")
@@ -260,7 +247,10 @@ def run(
         batch_words=embedding_params.batch_words,
     )
     logger.info("... done computing the embedding")
+    return training_graph, model
 
+
+def write_graph_and_model(path_out, training_graph, model):
     path_graph = os.path.join(path_out, "graph.gpickle")
     logger.info("Saving graph to %s...", path_graph)
     nx.write_gpickle(training_graph, path_graph)
@@ -275,3 +265,23 @@ def run(
     logger.info("- %s", path_model)
     model.save(path_model)
     logger.info("... done saving embedding to")
+
+
+def run(
+    path_out: str,
+    path_hgnc_json: str,
+    path_gene_hpo_links: str,
+    path_hpo_genes_to_phenotype: str,
+    path_hpo_obo: str,
+):
+    # load all data
+    ncbi_to_hgnc, hgnc_info = load_hgnc_info(path_hgnc_json)
+    clinvar_gen2phen = load_clinvar_gen2phen(path_gene_hpo_links)
+    hpo_gen2phen = load_hpo_gen2phen(path_hpo_genes_to_phenotype, ncbi_to_hgnc)
+    hpo_ontology, hpo_id_from_alt, hpo_id_to_name = load_hpo_ontology(path_hpo_obo)
+    _, _, _, _ = hgnc_info, hpo_gen2phen, hpo_id_from_alt, hpo_id_to_name
+
+    # build and fit model
+    training_graph, model = build_and_fit_model(clinvar_gen2phen, hpo_ontology)
+    # write out graph and model
+    write_graph_and_model(path_out, training_graph, model)
