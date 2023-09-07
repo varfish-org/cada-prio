@@ -1,8 +1,10 @@
 """Console script for CADA"""
 
+import typing
+
 import click
 
-from cada_prio import _version, train_model
+from cada_prio import _version, predict, train_model
 
 
 @click.group()
@@ -37,7 +39,49 @@ def cli_train_model(
     path_hpo_genes_to_phenotype: str,
     path_hpo_obo: str,
 ):
+    """train model"""
     ctx.ensure_object(dict)
     train_model.run(
         path_out, path_hgnc_json, path_gene_hpo_links, path_hpo_genes_to_phenotype, path_hpo_obo
     )
+
+
+@cli.command("predict")
+@click.argument("path_model", type=str)
+@click.option(
+    "--hpo-terms",
+    type=str,
+    help="comma-separate HPO terms or @file with space-separated ones",
+    required=True,
+)
+@click.option(
+    "--genes",
+    type=str,
+    help="comma-separated genes to restrict prediction to or @file with space-separated ones",
+)
+@click.pass_context
+def cli_predict(
+    ctx: click.Context,
+    path_model: str,
+    hpo_terms: str,
+    genes: typing.Optional[str],
+):
+    """perform prediction/prioritication"""
+    ctx.ensure_object(dict)
+
+    if hpo_terms.startswith("@"):
+        with open(hpo_terms[1:]) as f:
+            hpo_term_list = [x.strip() for x in f.read().split()]
+    else:
+        hpo_term_list = [x.strip() for x in hpo_terms.split(",")]
+
+    gene_list = None
+    if genes:
+        if genes.startswith("@"):
+            with open(genes[1:]) as f:
+                gene_list = [x.strip() for x in f.read().split()]
+        else:
+            gene_list = [x.strip() for x in genes.split(",")]
+
+    if predict.run(path_model, hpo_term_list, gene_list) != 0:
+        ctx.exit(1)
