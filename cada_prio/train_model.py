@@ -8,6 +8,7 @@ import warnings
 
 import attrs
 import cattrs
+from gensim.models import Word2Vec
 from logzero import logger
 import networkx as nx
 import node2vec
@@ -250,8 +251,17 @@ def build_and_fit_model(clinvar_gen2phen, hpo_ontology):
     return training_graph, model
 
 
-def write_graph_and_model(path_out, training_graph, model):
+def write_graph_and_model(
+    path_out, hgnc_info: typing.List[GeneIds], training_graph: nx.Graph, model: Word2Vec
+):
     os.makedirs(path_out, exist_ok=True)
+
+    path_hgnc_info = os.path.join(path_out, "hgnc_info.jsonl")
+    logger.info("Saving HGNC info to %s...", path_hgnc_info)
+    with open(path_hgnc_info, "w") as f:
+        for record in hgnc_info:
+            json.dump(cattrs.unstructure(record), f)
+    logger.info("... done saving HGNC info")
 
     path_graph = os.path.join(path_out, "graph.gpickle")
     logger.info("Saving graph to %s...", path_graph)
@@ -261,6 +271,7 @@ def write_graph_and_model(path_out, training_graph, model):
     logger.info("Saving embedding to %s...", path_out)
     path_embeddings = os.path.join(path_out, "embedding")
     logger.info("- %s", path_embeddings)
+    print(type(model.wv), model.wv)
     model.wv.save_word2vec_format(path_embeddings)
     path_model = os.path.join(path_out, "model")
     logger.info("- %s", path_model)
@@ -280,9 +291,9 @@ def run(
     clinvar_gen2phen = load_clinvar_gen2phen(path_gene_hpo_links)
     hpo_gen2phen = load_hpo_gen2phen(path_hpo_genes_to_phenotype, ncbi_to_hgnc)
     hpo_ontology, hpo_id_from_alt, hpo_id_to_name = load_hpo_ontology(path_hpo_obo)
-    _, _, _, _ = hgnc_info, hpo_gen2phen, hpo_id_from_alt, hpo_id_to_name
+    _, _, _ = hpo_gen2phen, hpo_id_from_alt, hpo_id_to_name
 
     # build and fit model
     training_graph, model = build_and_fit_model(clinvar_gen2phen, hpo_ontology)
     # write out graph and model
-    write_graph_and_model(path_out, training_graph, model)
+    write_graph_and_model(path_out, hgnc_info, training_graph, model)

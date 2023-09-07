@@ -4,4 +4,6 @@ class KeyedVectors:
 class Word2Vec:
     wv: KeyedVectors
 
+    @classmethod
+    def load(cls, fname: str): ...
     def save(self, fname: str): ...
