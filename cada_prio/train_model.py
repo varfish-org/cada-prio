@@ -109,7 +109,7 @@ def load_hpo_gen2phen(
             ncbi_gene_id = record["ncbi_gene_id"]
             if ncbi_gene_id not in ncbi_to_hgnc:
                 if ncbi_gene_id not in warned_about:
-                    logger.warn("No HGNC entry for Entrez %s found", ncbi_gene_id)
+                    logger.warning("No HGNC entry for Entrez %s found", ncbi_gene_id)
                     warned_about.add(ncbi_gene_id)
                 continue
             hgnc_id = ncbi_to_hgnc[ncbi_gene_id]
@@ -251,13 +251,14 @@ def build_and_fit_model(clinvar_gen2phen, hpo_ontology):
 
 
 def write_graph_and_model(path_out, training_graph, model):
+    os.makedirs(path_out, exist_ok=True)
+
     path_graph = os.path.join(path_out, "graph.gpickle")
     logger.info("Saving graph to %s...", path_graph)
     nx.write_gpickle(training_graph, path_graph)
     logger.info("... done saving graph")
 
     logger.info("Saving embedding to %s...", path_out)
-    os.makedirs(path_out, exist_ok=True)
     path_embeddings = os.path.join(path_out, "embedding")
     logger.info("- %s", path_embeddings)
     model.wv.save_word2vec_format(path_embeddings)
