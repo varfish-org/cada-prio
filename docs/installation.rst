@@ -24,10 +24,10 @@ If you don't have `pip <https://pip.pypa.io>`__ installed, this `Python installa
 From Sources
 ------------
 
-The sources for CADA can be downloaded from the `Github repo <https://github.com/bihealth/cada-ng>`__.
+The sources for CADA can be downloaded from the `Github repo <https://github.com/bihealth/cada-prio>`__.
 
 Clone the public repository:
 
 .. code-block:: console
 
-    $ git clone https://github.com/bihealth/cada-ng.git
+    $ git clone https://github.com/bihealth/cada-prio.git

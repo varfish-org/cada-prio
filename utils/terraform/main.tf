@@ -1,7 +1,7 @@
 # Mangement of the GitHub project.
 
-resource "github_repository" "cada-ng" {
-  name        = "cada-ng"
+resource "github_repository" "cada-prio" {
+  name        = "cada-prio"
   description = "Re-implementation of the CADA phenotype-based prioritization algorithm"
 
   has_issues = true
