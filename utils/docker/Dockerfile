@@ -43,12 +43,12 @@ ENV PATH="/.venv/bin:$PATH"
 
 COPY cada_prio cada_prio
 COPY requirements requirements
-COPY setup.py requirements.txt README.md CHANGELOG.md .
+COPY setup.py requirements.txt README.md CHANGELOG.md ./
 RUN pip install .
 
 RUN useradd --create-home cada_prio
 WORKDIR /home/cada_prio
 USER cada_prio
 
-CMD ["uvicorn", "cada_prio.server:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "cada_prio.rest_server:app", "--host", "0.0.0.0", "--port", "8080"]
 EXPOSE 8080

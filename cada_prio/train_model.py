@@ -3,6 +3,7 @@ import enum
 import itertools
 import json
 import os
+import pickle
 import typing
 import warnings
 
@@ -265,7 +266,8 @@ def write_graph_and_model(
 
     path_graph = os.path.join(path_out, "graph.gpickle")
     logger.info("Saving graph to %s...", path_graph)
-    nx.write_gpickle(training_graph, path_graph)
+    with open(path_graph, "wb") as outputf:
+        pickle.dump(training_graph, outputf)
     logger.info("... done saving graph")
 
     logger.info("Saving embedding to %s...", path_out)
