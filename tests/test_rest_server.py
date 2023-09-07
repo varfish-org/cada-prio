@@ -1,4 +1,3 @@
-import os
 from unittest import mock
 
 import pytest
@@ -7,6 +6,7 @@ from starlette.testclient import TestClient
 from cada_prio import rest_server
 
 
+@mock.patch("cada_prio.rest_server.PATH_DATA", "tests/data/model_smoke")
 @pytest.mark.asyncio
 async def test_version():
     with TestClient(rest_server.app) as client:
@@ -14,7 +14,7 @@ async def test_version():
         assert response.status_code == 200
 
 
-@mock.patch.dict(os.environ, {"PATH_DATA": "tests/data/model_smoke"}, clear=True)
+@mock.patch("cada_prio.rest_server.PATH_DATA", "tests/data/model_smoke")
 @pytest.mark.asyncio
 async def test_predict_with_gene():
     with TestClient(rest_server.app) as client:
@@ -22,7 +22,7 @@ async def test_predict_with_gene():
         assert response.status_code == 200
 
 
-@mock.patch.dict(os.environ, {"PATH_DATA": "tests/data/model_smoke"}, clear=True)
+@mock.patch("cada_prio.rest_server.PATH_DATA", "tests/data/model_smoke")
 @pytest.mark.asyncio
 async def test_predict_without_gene():
     with TestClient(rest_server.app) as client:

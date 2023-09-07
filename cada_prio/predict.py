@@ -2,12 +2,12 @@
 
 import json
 import os
+import pickle
 import typing
 
 import cattrs
 from gensim.models import Word2Vec
 from logzero import logger
-import networkx as nx
 import numpy as np
 
 from cada_prio import train_model
@@ -36,7 +36,8 @@ def load_hgnc_info(path_model):
 
 def load_graph_model(path_model):
     logger.info("Loading graph...")
-    graph = nx.read_gpickle(os.path.join(path_model, "graph.gpickle"))
+    with open(os.path.join(path_model, "graph.gpickle"), "rb") as inputf:
+        graph = pickle.load(inputf)
     logger.info("... done loading graph")
     logger.info("Loading model...")
     model = Word2Vec.load(os.path.join(path_model, "model"))
