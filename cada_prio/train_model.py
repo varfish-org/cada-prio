@@ -1,5 +1,6 @@
 import csv
 import enum
+import gzip
 import itertools
 import json
 import os
@@ -70,8 +71,13 @@ class GeneToPhenotypeRecord:
 
 
 def load_gene_phenotype_records(path: str) -> typing.Iterable[GenePhenotypeRecord]:
-    with open(path) as f:
-        for line in f:
+    if path.endswith(".gz"):
+        inputf = gzip.open(path, "rt")
+    else:
+        inputf = open(path, "rt")
+
+    with inputf:
+        for line in inputf:
             yield cattrs.structure(json.loads(line), GenePhenotypeRecord)
 
 
