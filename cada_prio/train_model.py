@@ -224,12 +224,16 @@ class EmbeddingParams:
     workers: int = 4
 
 
-def build_and_fit_model(clinvar_gen2phen, hpo_ontology):
+def build_and_fit_model(*, clinvar_gen2phen, hpo_gen2phen, hpo_ontology):
     # create graph edges combining HPO hierarchy and training edges from ClinVar
     logger.info("Constructing training graph ...")
     logger.info("- building edges ...")
     training_edges = list(
-        itertools.chain(yield_hpo_edges(hpo_ontology), yield_gene2phen_edges(clinvar_gen2phen))
+        itertools.chain(
+            yield_hpo_edges(hpo_ontology),
+            yield_gene2phen_edges(hpo_gen2phen),
+            yield_gene2phen_edges(clinvar_gen2phen),
+        )
     )
     logger.info("- graph construction")
     training_graph = nx.Graph()
@@ -299,9 +303,11 @@ def run(
     clinvar_gen2phen = load_clinvar_gen2phen(path_gene_hpo_links)
     hpo_gen2phen = load_hpo_gen2phen(path_hpo_genes_to_phenotype, ncbi_to_hgnc)
     hpo_ontology, hpo_id_from_alt, hpo_id_to_name = load_hpo_ontology(path_hpo_obo)
-    _, _, _ = hpo_gen2phen, hpo_id_from_alt, hpo_id_to_name
+    _, _ = hpo_id_from_alt, hpo_id_to_name
 
     # build and fit model
-    training_graph, model = build_and_fit_model(clinvar_gen2phen, hpo_ontology)
+    training_graph, model = build_and_fit_model(
+        clinvar_gen2phen=clinvar_gen2phen, hpo_gen2phen=hpo_gen2phen, hpo_ontology=hpo_ontology
+    )
     # write out graph and model
     write_graph_and_model(path_out, hgnc_info, training_graph, model)
