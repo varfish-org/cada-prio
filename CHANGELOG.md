@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.2.1](https://www.github.com/bihealth/cada-prio/compare/v0.2.0...v0.2.1) (2023-09-08)
+
+
+### Bug Fixes
+
+* removing spurious debug print statement ([#7](https://www.github.com/bihealth/cada-prio/issues/7)) ([98e7443](https://www.github.com/bihealth/cada-prio/commit/98e74433001872517a4904bbe85fd021cc4ad613))
+
 ## [0.2.0](https://www.github.com/bihealth/cada-prio/compare/v0.1.0...v0.2.0) (2023-09-08)
 
 
