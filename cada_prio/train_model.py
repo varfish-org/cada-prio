@@ -279,7 +279,6 @@ def write_graph_and_model(
     logger.info("Saving embedding to %s...", path_out)
     path_embeddings = os.path.join(path_out, "embedding")
     logger.info("- %s", path_embeddings)
-    print(type(model.wv), model.wv)
     model.wv.save_word2vec_format(path_embeddings)
     path_model = os.path.join(path_out, "model")
     logger.info("- %s", path_model)
