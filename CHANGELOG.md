@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://www.github.com/bihealth/cada-prio/compare/v0.1.0...v0.2.0) (2023-09-08)
+
+
+### Features
+
+* gene to phenotype links file can be gziped ([#5](https://www.github.com/bihealth/cada-prio/issues/5)) ([66c48bf](https://www.github.com/bihealth/cada-prio/commit/66c48bf98c8bd73f8227c7cbd5687b4e74577ef8))
+
 ## 0.1.0 (2023-09-07)
 
 
