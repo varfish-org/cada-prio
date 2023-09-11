@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://www.github.com/bihealth/cada-prio/compare/v0.2.1...v0.3.0) (2023-09-11)
+
+
+### Features
+
+* also adding gene-to-phen edges from HPO ([#9](https://www.github.com/bihealth/cada-prio/issues/9)) ([d5a8337](https://www.github.com/bihealth/cada-prio/commit/d5a833774b1488fb7e1f0650692aab2c3f753144))
+
 ### [0.2.1](https://www.github.com/bihealth/cada-prio/compare/v0.2.0...v0.2.1) (2023-09-08)
 
 
