@@ -30,6 +30,7 @@ def cli(ctx: click.Context, verbose: bool):
     required=True,
 )
 @click.option("--path-hpo-obo", type=str, help="path HPO OBO file", required=True)
+@click.option("--cpus", type=int, help="number of CPUs to use", default=1)
 @click.pass_context
 def cli_train_model(
     ctx: click.Context,
@@ -38,6 +39,7 @@ def cli_train_model(
     path_gene_hpo_links: str,
     path_hpo_genes_to_phenotype: str,
     path_hpo_obo: str,
+    cpus: int,
 ):
     """train model"""
     ctx.ensure_object(dict)
@@ -47,6 +49,7 @@ def cli_train_model(
         path_gene_hpo_links,
         path_hpo_genes_to_phenotype,
         path_hpo_obo,
+        cpus,
     )
 
 

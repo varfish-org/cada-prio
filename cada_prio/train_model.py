@@ -220,11 +220,9 @@ class EmbeddingParams:
     min_count: int = 1
     #: Set the batch_words in the fitting
     batch_words: int = 4
-    #: Number of workers threads to use
-    workers: int = 4
 
 
-def build_and_fit_model(*, clinvar_gen2phen, hpo_gen2phen, hpo_ontology):
+def build_and_fit_model(*, clinvar_gen2phen, hpo_gen2phen, hpo_ontology, cpus: int = 1):
     # create graph edges combining HPO hierarchy and training edges from ClinVar
     logger.info("Constructing training graph ...")
     logger.info("- building edges ...")
@@ -250,7 +248,7 @@ def build_and_fit_model(*, clinvar_gen2phen, hpo_gen2phen, hpo_ontology):
         num_walks=embedding_params.num_walks,
         p=embedding_params.p,
         q=embedding_params.q,
-        workers=embedding_params.workers,
+        workers=cpus,
     )
     logger.info("- fitting model")
     model = embedding.fit(
@@ -297,6 +295,7 @@ def run(
     path_gene_hpo_links: str,
     path_hpo_genes_to_phenotype: str,
     path_hpo_obo: str,
+    cpus: int = 1,
 ):
     # load all data
     ncbi_to_hgnc, hgnc_info = load_hgnc_info(path_hgnc_json)
@@ -307,7 +306,10 @@ def run(
 
     # build and fit model
     training_graph, model = build_and_fit_model(
-        clinvar_gen2phen=clinvar_gen2phen, hpo_gen2phen=hpo_gen2phen, hpo_ontology=hpo_ontology
+        clinvar_gen2phen=clinvar_gen2phen,
+        hpo_gen2phen=hpo_gen2phen,
+        hpo_ontology=hpo_ontology,
+        cpus=cpus,
     )
     # write out graph and model
     write_graph_and_model(path_out, hgnc_info, training_graph, model)
