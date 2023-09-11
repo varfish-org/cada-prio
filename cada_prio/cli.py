@@ -42,7 +42,11 @@ def cli_train_model(
     """train model"""
     ctx.ensure_object(dict)
     train_model.run(
-        path_out, path_hgnc_json, path_gene_hpo_links, path_hpo_genes_to_phenotype, path_hpo_obo
+        path_out,
+        path_hgnc_json,
+        path_gene_hpo_links,
+        path_hpo_genes_to_phenotype,
+        path_hpo_obo,
     )
 
 
