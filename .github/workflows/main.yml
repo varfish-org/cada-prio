@@ -94,6 +94,7 @@ jobs:
             pip freeze
 
       - name: Run tests
-        run: pytest
+        run: |
+          pytest -vvv --capture=no
 
       - uses: codecov/codecov-action@v3
