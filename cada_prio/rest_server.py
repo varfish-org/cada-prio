@@ -60,10 +60,10 @@ class PredictionResult(BaseModel):
 @app.get("/predict")
 async def handle_predict(
     hpo_terms: typing.Annotated[str, Query()],
-    genes: typing.Annotated[typing.Optional[str], Query()] = [],
+    genes: typing.Annotated[typing.Optional[str], Query()] = None,
 ):
     hpo_terms_list = hpo_terms.split(",")
-    genes_list = genes.split(",")
+    genes_list = genes.split(",") if genes else None
     _, sorted_scores = predict.run_prediction(
         hpo_terms_list,
         genes_list,
