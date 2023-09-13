@@ -270,6 +270,7 @@ def write_graph_and_model(
     with open(path_hgnc_info, "w") as f:
         for record in hgnc_info:
             json.dump(cattrs.unstructure(record), f)
+            f.write("\n")
     logger.info("... done saving HGNC info")
 
     path_graph = os.path.join(path_out, "graph.gpickle")
