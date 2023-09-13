@@ -59,12 +59,14 @@ class PredictionResult(BaseModel):
 # Register endpoint for the prediction
 @app.get("/predict")
 async def handle_predict(
-    hpo_terms: typing.Annotated[typing.List[str], Query()],
-    genes: typing.Annotated[typing.Optional[typing.List[str]], Query()] = [],
+    hpo_terms: typing.Annotated[str, Query()],
+    genes: typing.Annotated[typing.Optional[str], Query()] = [],
 ):
+    hpo_terms_list = hpo_terms.split(",")
+    genes_list = genes.split(",")
     _, sorted_scores = predict.run_prediction(
-        hpo_terms,
-        genes,
+        hpo_terms_list,
+        genes_list,
         GLOBAL_STATIC["all_to_hgnc"],
         GLOBAL_STATIC["graph"],
         GLOBAL_STATIC["model"],
