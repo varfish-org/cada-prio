@@ -1,5 +1,13 @@
 # Changelog
 
+### [0.3.1](https://www.github.com/bihealth/cada-prio/compare/v0.3.0...v0.3.1) (2023-09-13)
+
+
+### Bug Fixes
+
+* add missing line endings to hgnc_info.jsonl ([#13](https://www.github.com/bihealth/cada-prio/issues/13)) ([aa14b9b](https://www.github.com/bihealth/cada-prio/commit/aa14b9b948a0e9512c57567de2acaa65e9b132bc))
+* properly parsing comma-separated list on REST API ([#14](https://www.github.com/bihealth/cada-prio/issues/14)) ([97fdfee](https://www.github.com/bihealth/cada-prio/commit/97fdfeee118d2e4985ca71433617fd9c470d0b49))
+
 ## [0.3.0](https://www.github.com/bihealth/cada-prio/compare/v0.2.1...v0.3.0) (2023-09-11)
 
 
