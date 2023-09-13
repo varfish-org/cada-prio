@@ -66,7 +66,6 @@ def run_prediction(
     # Map gene IDs to HGNC IDs
     genes = []
     for orig_gene in orig_genes or []:
-        print(all_to_hgnc.get(orig_gene))
         if orig_gene in all_to_hgnc:
             genes.append(all_to_hgnc[orig_gene].hgnc_id)
         else:
