@@ -220,9 +220,20 @@ class EmbeddingParams:
     min_count: int = 1
     #: Set the batch_words in the fitting
     batch_words: int = 4
+    #: RNG seed for embedding
+    seed_embedding: int = 1
+    #: RNG seed for fitting
+    seed_fit: int = 1
 
 
-def build_and_fit_model(*, clinvar_gen2phen, hpo_gen2phen, hpo_ontology, cpus: int = 1):
+def build_and_fit_model(
+    *,
+    clinvar_gen2phen,
+    hpo_gen2phen,
+    hpo_ontology,
+    embedding_params: EmbeddingParams,
+    cpus: int = 1
+):
     # create graph edges combining HPO hierarchy and training edges from ClinVar
     logger.info("Constructing training graph ...")
     logger.info("- building edges ...")
@@ -233,8 +244,6 @@ def build_and_fit_model(*, clinvar_gen2phen, hpo_gen2phen, hpo_ontology, cpus: i
             yield_gene2phen_edges(clinvar_gen2phen),
         )
     )
-    with open("__trainign_edges.json", "wt") as outputf:
-        print(json.dumps(cattrs.unstructure(training_edges), indent=2), file=outputf)
     logger.info("- graph construction")
     training_graph = nx.Graph()
     training_graph.add_edges_from(training_edges)
@@ -242,7 +251,9 @@ def build_and_fit_model(*, clinvar_gen2phen, hpo_gen2phen, hpo_ontology, cpus: i
 
     logger.info("Computing the embedding / model fit...")
     logger.info("- embedding graph")
-    embedding_params = EmbeddingParams()
+    logger.info(
+        "- using parameters:\n%s", json.dumps(cattrs.unstructure(embedding_params), indent=2)
+    )
     embedding = node2vec.Node2Vec(
         training_graph,
         dimensions=embedding_params.dimensions,
@@ -251,12 +262,14 @@ def build_and_fit_model(*, clinvar_gen2phen, hpo_gen2phen, hpo_ontology, cpus: i
         p=embedding_params.p,
         q=embedding_params.q,
         workers=cpus,
+        seed=embedding_params.seed_embedding,
     )
     logger.info("- fitting model")
     model = embedding.fit(
         window=embedding_params.window,
         min_count=embedding_params.min_count,
         batch_words=embedding_params.batch_words,
+        seed=embedding_params.seed_fit,
     )
     logger.info("... done computing the embedding")
     return training_graph, model, embedding_params
@@ -299,15 +312,30 @@ def write_graph_and_model(
     logger.info("... done saving embedding to")
 
 
+def load_embedding_params(path_embedding_params: typing.Optional[str]):
+    if path_embedding_params:
+        logger.info("Loading embedding parameters from %s...", path_embedding_params)
+        with open(path_embedding_params, "rt") as inputf:
+            embedding_params_dict = json.load(inputf)
+        logger.info("... done loading embedding parameters")
+    else:
+        logger.info("Using default embedding parameters")
+        embedding_params_dict = {}
+
+    return cattrs.structure(embedding_params_dict, EmbeddingParams)
+
+
 def run(
     path_out: str,
     path_hgnc_json: str,
     path_gene_hpo_links: str,
     path_hpo_genes_to_phenotype: str,
     path_hpo_obo: str,
+    path_embedding_params: typing.Optional[str] = None,
     cpus: int = 1,
 ):
     # load all data
+    embedding_params = load_embedding_params(path_embedding_params)
     ncbi_to_hgnc, hgnc_info = load_hgnc_info(path_hgnc_json)
     clinvar_gen2phen = load_clinvar_gen2phen(path_gene_hpo_links)
     hpo_gen2phen = load_hpo_gen2phen(path_hpo_genes_to_phenotype, ncbi_to_hgnc)
@@ -319,6 +347,7 @@ def run(
         clinvar_gen2phen=clinvar_gen2phen,
         hpo_gen2phen=hpo_gen2phen,
         hpo_ontology=hpo_ontology,
+        embedding_params=embedding_params,
         cpus=cpus,
     )
     # write out graph and model
