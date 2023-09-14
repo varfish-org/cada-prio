@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.4.0](https://www.github.com/bihealth/cada-prio/compare/v0.3.1...v0.4.0) (2023-09-14)
+
+
+### Features
+
+* adding dump-graph to cli ([#18](https://www.github.com/bihealth/cada-prio/issues/18)) ([3aace31](https://www.github.com/bihealth/cada-prio/commit/3aace31166ddbd4357ae32283b6514a21404e0ef))
+* adding param-opt command with single parameter evaluation ([#20](https://www.github.com/bihealth/cada-prio/issues/20)) ([83141c6](https://www.github.com/bihealth/cada-prio/commit/83141c6c4afe6efffc51fcde1ebdc92b5b3d0fbf))
+* allow running with legacy model/graph data ([#16](https://www.github.com/bihealth/cada-prio/issues/16)) ([9d3cc7c](https://www.github.com/bihealth/cada-prio/commit/9d3cc7cea6efeac82b41fe11dfc9527ab4fe2913))
+* embedding parameters can be provided via CLI and contains seeds ([#19](https://www.github.com/bihealth/cada-prio/issues/19)) ([bbd5d86](https://www.github.com/bihealth/cada-prio/commit/bbd5d86e879db94240093c20145b1c4c45edc69e))
+
 ### [0.3.1](https://www.github.com/bihealth/cada-prio/compare/v0.3.0...v0.3.1) (2023-09-13)
 
 
