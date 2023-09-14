@@ -4,7 +4,7 @@ import typing
 
 import click
 
-from cada_prio import _version, predict, train_model
+from cada_prio import _version, inspection, predict, train_model
 
 
 @click.group()
@@ -92,3 +92,17 @@ def cli_predict(
 
     if predict.run(path_model, hpo_term_list, gene_list) != 0:
         ctx.exit(1)
+
+
+@cli.command("dump-graph")
+@click.argument("path_graph", type=str)
+@click.argument("path_hgnc_info", type=str)
+@click.pass_context
+def cli_dump_graph(
+    ctx: click.Context,
+    path_graph: str,
+    path_hgnc_info: str,
+):
+    """dump graph edges for debugging"""
+    ctx.ensure_object(dict)
+    inspection.dump_graph(path_graph, path_hgnc_info)

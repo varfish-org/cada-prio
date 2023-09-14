@@ -27,7 +27,9 @@ GLOBAL_STATIC = {}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load the models
-    all_to_hgnc, hgnc_info_by_id = predict.load_hgnc_info(PATH_DATA)
+    all_to_hgnc, hgnc_info_by_id = predict.load_hgnc_info(
+        os.path.join(PATH_DATA, "hgnc_info.jsonl")
+    )
     GLOBAL_STATIC["all_to_hgnc"] = all_to_hgnc
     GLOBAL_STATIC["hgnc_info_by_id"] = hgnc_info_by_id
     graph, model = predict.load_graph_model(PATH_DATA)

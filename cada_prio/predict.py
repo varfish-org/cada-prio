@@ -13,11 +13,10 @@ import numpy as np
 from cada_prio import train_model
 
 
-def load_hgnc_info(path_model):
+def load_hgnc_info(path_hgnc_jsonl):
     logger.info("Loading HGNC info...")
     logger.info("- parsing")
     hgnc_infos = []
-    path_hgnc_jsonl = os.path.join(path_model, "hgnc_info.jsonl")
     with open(path_hgnc_jsonl, "rt") as f:
         for line in f:
             hgnc_infos.append(cattrs.structure(json.loads(line), train_model.GeneIds))
@@ -98,7 +97,7 @@ def run(
     orig_genes: typing.Optional[typing.List[str]] = None,
 ) -> int:
     # Load and prepare data
-    all_to_hgnc, hgnc_info_by_id = load_hgnc_info(path_model)
+    all_to_hgnc, hgnc_info_by_id = load_hgnc_info(os.path.join(path_model, "hgnc_info.jsonl"))
     graph, model = load_graph_model(path_model)
     try:
         hpo_terms, sorted_scores = run_prediction(
