@@ -5,6 +5,7 @@ import itertools
 import json
 import os
 import pickle
+import shutil
 import typing
 import warnings
 
@@ -232,7 +233,7 @@ def build_and_fit_model(
     hpo_gen2phen,
     hpo_ontology,
     embedding_params: EmbeddingParams,
-    cpus: int = 1
+    cpus: int = 1,
 ):
     # create graph edges combining HPO hierarchy and training edges from ClinVar
     logger.info("Constructing training graph ...")
@@ -270,6 +271,7 @@ def build_and_fit_model(
         min_count=embedding_params.min_count,
         batch_words=embedding_params.batch_words,
         seed=embedding_params.seed_fit,
+        workers=cpus,
     )
     logger.info("... done computing the embedding")
     return training_graph, model, embedding_params
@@ -352,3 +354,5 @@ def run(
     )
     # write out graph and model
     write_graph_and_model(path_out, hgnc_info, training_graph, embedding_params, model)
+
+    shutil.copyfile(path_hpo_obo, f"{path_out}/hp.obo")
