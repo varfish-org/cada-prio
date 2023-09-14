@@ -79,7 +79,7 @@ def run_prediction(
             genes.append(orig_gene)
 
     # Generate a score for each gene in the knowledge graph
-    logger.info("Generating scores...")
+    logger.debug("Generating scores...")
     gene_scores = {}
     for node_id in graph.nodes():
         if translate_legacy_entrez_ids and node_id.startswith("Entrez:"):

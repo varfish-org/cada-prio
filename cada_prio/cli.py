@@ -1,10 +1,12 @@
 """Console script for CADA"""
 
+import logging
 import typing
 
 import click
+import logzero
 
-from cada_prio import _version, inspection, predict, train_model
+from cada_prio import _version, inspection, param_opt, predict, train_model
 
 
 @click.group()
@@ -15,6 +17,10 @@ def cli(ctx: click.Context, verbose: bool):
     """Main entry point for CLI via click."""
     ctx.ensure_object(dict)
     ctx.obj["verbose"] = verbose
+    if verbose:
+        logzero.loglevel(logging.DEBUG)
+    else:
+        logzero.loglevel(logging.INFO)
 
 
 @cli.command("train-model")
@@ -111,3 +117,55 @@ def cli_dump_graph(
     """dump graph edges for debugging"""
     ctx.ensure_object(dict)
     inspection.dump_graph(path_graph, path_hgnc_info)
+
+
+@cli.command("param-opt")
+@click.option("--path-hgnc-json", type=str, help="path to HGNC JSON", required=True)
+@click.option(
+    "--path-hpo-genes-to-phenotype",
+    type=str,
+    help="path to genes_to_phenotype.txt file",
+    required=True,
+)
+@click.option("--path-hpo-obo", type=str, help="path HPO OBO file", required=True)
+@click.option(
+    "--path-clinvar-phenotype-links",
+    type=str,
+    help="path to ClinVar phenotype links JSONL",
+    required=True,
+)
+@click.option(
+    "--fraction-links",
+    type=float,
+    help="fraction of links to add to the graph",
+    required=True,
+)
+@click.option(
+    "--seed",
+    type=int,
+    help="seed for random number generator",
+    default=1,
+)
+@click.option("--cpus", type=int, help="number of CPUs to use", default=1)
+@click.pass_context
+def cli_param_opt(
+    ctx: click.Context,
+    path_hgnc_json: str,
+    path_hpo_genes_to_phenotype: str,
+    path_hpo_obo: str,
+    path_clinvar_phenotype_links: str,
+    fraction_links: float,
+    seed: int,
+    cpus: int,
+):
+    """dump graph edges for debugging"""
+    ctx.ensure_object(dict)
+    param_opt.perform_parameter_optimization(
+        path_hgnc_json=path_hgnc_json,
+        path_hpo_genes_to_phenotype=path_hpo_genes_to_phenotype,
+        path_hpo_obo=path_hpo_obo,
+        path_clinvar_phenotype_links=path_clinvar_phenotype_links,
+        fraction_links=fraction_links,
+        seed=seed,
+        cpus=cpus,
+    )
