@@ -19,6 +19,8 @@ load_dotenv()
 DEBUG = env.get("CADA_DEBUG", "false").lower() in ("true", "1")
 #: Path to data / model
 PATH_DATA = env.get("CADA_PATH_DATA", "/data/cada")
+#: Optional path to legacy model from CADA
+PATH_LEGACY = env.get("CADA_PATH_LEGACY", None)
 
 #: The CADA models, to be loaded on startup.
 GLOBAL_STATIC = {}
@@ -30,7 +32,7 @@ async def lifespan(app: FastAPI):
     all_to_hgnc, hgnc_info_by_id = predict.load_hgnc_info(PATH_DATA)
     GLOBAL_STATIC["all_to_hgnc"] = all_to_hgnc
     GLOBAL_STATIC["hgnc_info_by_id"] = hgnc_info_by_id
-    graph, model = predict.load_graph_model(PATH_DATA)
+    graph, model = predict.load_graph_model(PATH_DATA, PATH_LEGACY)
     GLOBAL_STATIC["graph"] = graph
     GLOBAL_STATIC["model"] = model
 
@@ -68,6 +70,7 @@ async def handle_predict(
         GLOBAL_STATIC["all_to_hgnc"],
         GLOBAL_STATIC["graph"],
         GLOBAL_STATIC["model"],
+        PATH_LEGACY is not None,
     )
     hgnc_info_by_id = GLOBAL_STATIC["hgnc_info_by_id"]
     return [
