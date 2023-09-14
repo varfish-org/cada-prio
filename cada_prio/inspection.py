@@ -8,7 +8,7 @@ from cada_prio.predict import load_hgnc_info
 
 
 def dump_graph(path_graph: str, path_hgnc_info: str):
-    _all_to_hgnc, hgnc_info_by_id = load_hgnc_info(path_hgnc_info)
+    _, hgnc_info_by_id = load_hgnc_info(path_hgnc_info)
     with open(path_graph, "rb") as inputf:
         graph: nx.Graph = pickle.load(inputf)
     for edge in sorted(graph.edges):
