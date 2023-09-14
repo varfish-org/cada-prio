@@ -233,6 +233,8 @@ def build_and_fit_model(*, clinvar_gen2phen, hpo_gen2phen, hpo_ontology, cpus: i
             yield_gene2phen_edges(clinvar_gen2phen),
         )
     )
+    with open("__trainign_edges.json", "wt") as outputf:
+        print(json.dumps(cattrs.unstructure(training_edges), indent=2), file=outputf)
     logger.info("- graph construction")
     training_graph = nx.Graph()
     training_graph.add_edges_from(training_edges)
@@ -257,11 +259,15 @@ def build_and_fit_model(*, clinvar_gen2phen, hpo_gen2phen, hpo_ontology, cpus: i
         batch_words=embedding_params.batch_words,
     )
     logger.info("... done computing the embedding")
-    return training_graph, model
+    return training_graph, model, embedding_params
 
 
 def write_graph_and_model(
-    path_out, hgnc_info: typing.List[GeneIds], training_graph: nx.Graph, model: Word2Vec
+    path_out,
+    hgnc_info: typing.List[GeneIds],
+    training_graph: nx.Graph,
+    embedding_params: EmbeddingParams,
+    model: Word2Vec,
 ):
     os.makedirs(path_out, exist_ok=True)
 
@@ -286,6 +292,10 @@ def write_graph_and_model(
     path_model = os.path.join(path_out, "model")
     logger.info("- %s", path_model)
     model.save(path_model)
+    path_params = os.path.join(path_out, "embedding_params.json")
+    logger.info("- %s", path_params)
+    with open(path_params, "wt") as outputf:
+        print(json.dumps(cattrs.unstructure(embedding_params), indent=2), file=outputf)
     logger.info("... done saving embedding to")
 
 
@@ -305,11 +315,11 @@ def run(
     _, _ = hpo_id_from_alt, hpo_id_to_name
 
     # build and fit model
-    training_graph, model = build_and_fit_model(
+    training_graph, model, embedding_params = build_and_fit_model(
         clinvar_gen2phen=clinvar_gen2phen,
         hpo_gen2phen=hpo_gen2phen,
         hpo_ontology=hpo_ontology,
         cpus=cpus,
     )
     # write out graph and model
-    write_graph_and_model(path_out, hgnc_info, training_graph, model)
+    write_graph_and_model(path_out, hgnc_info, training_graph, embedding_params, model)
