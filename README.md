@@ -20,12 +20,6 @@ Install with `tune` feature enabled:
 pip install cada-prio[tune]
 ```
 
-Create study with `optuna`:
-
-```
-optuna create-study --storage sqlite:///local_data/cada-tune.sqlite --study-name=cada-tune
-```
-
 Run tuning, e.g., on the "classic" model.
 Thanks to [optuna](https://optuna.org/), you can run this in parallel as long as the database is shared.
 Each run will use 4 CPUs in the example below and perform 1 trial.

@@ -304,5 +304,7 @@ if HAVE_OPTUNA:
                 return result[100]
 
         optuna.logging.get_logger("optuna").addHandler(logging.StreamHandler(sys.stdout))
-        study = optuna.load_study(study_name=study_name, storage=storage)
+        study = optuna.create_study(
+            study_name=study_name, storage=storage, load_if_exists=True, direction="maximize"
+        )
         study.optimize(objective, n_trials=n_trials)
