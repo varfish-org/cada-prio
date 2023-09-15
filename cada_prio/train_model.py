@@ -1,4 +1,5 @@
 import csv
+from datetime import timedelta
 import enum
 import gzip
 import itertools
@@ -6,6 +7,7 @@ import json
 import os
 import pickle
 import shutil
+import time
 import typing
 import warnings
 
@@ -251,10 +253,11 @@ def build_and_fit_model(
     logger.info("... done constructing training graph with %s edges", len(training_edges))
 
     logger.info("Computing the embedding / model fit...")
-    logger.info("- embedding graph")
+    logger.info("- embedding graph...")
     logger.info(
-        "- using parameters:\n%s", json.dumps(cattrs.unstructure(embedding_params), indent=2)
+        "  - using parameters:\n%s", json.dumps(cattrs.unstructure(embedding_params), indent=2)
     )
+    embedding_start = time.time()
     embedding = node2vec.Node2Vec(
         training_graph,
         dimensions=embedding_params.dimensions,
@@ -265,7 +268,10 @@ def build_and_fit_model(
         workers=cpus,
         seed=embedding_params.seed_embedding,
     )
-    logger.info("- fitting model")
+    embedding_elapsed = time.time() - embedding_start
+    logger.info("  embedding took %s", timedelta(seconds=embedding_elapsed))
+    fit_start = time.time()
+    logger.info("- fitting model...")
     model = embedding.fit(
         window=embedding_params.window,
         min_count=embedding_params.min_count,
@@ -273,6 +279,8 @@ def build_and_fit_model(
         seed=embedding_params.seed_fit,
         workers=cpus,
     )
+    fit_elapsed = time.time() - fit_start
+    logger.info("  fitting took %s", timedelta(seconds=fit_elapsed))
     logger.info("... done computing the embedding")
     return training_graph, model, embedding_params
 
@@ -311,7 +319,7 @@ def write_graph_and_model(
     logger.info("- %s", path_params)
     with open(path_params, "wt") as outputf:
         print(json.dumps(cattrs.unstructure(embedding_params), indent=2), file=outputf)
-    logger.info("... done saving embedding to")
+    logger.info("... done saving embedding")
 
 
 def load_embedding_params(path_embedding_params: typing.Optional[str]):
