@@ -307,4 +307,4 @@ if HAVE_OPTUNA:
         study = optuna.create_study(
             study_name=study_name, storage=storage, load_if_exists=True, direction="maximize"
         )
-        study.optimize(objective, n_trials=n_trials)
+        study.optimize(objective, n_trials=n_trials, gc_after_trial=True)
