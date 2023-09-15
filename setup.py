@@ -29,6 +29,7 @@ with open("CHANGELOG.md") as history_file:
 
 test_requirements = parse_requirements("requirements/test.txt")
 install_requirements = parse_requirements("requirements/base.txt")
+tune_requirements = parse_requirements("requirements/tune.txt")
 
 
 package_root = os.path.abspath(os.path.dirname(__file__))
@@ -54,6 +55,9 @@ setup(
     description="Phenotype-based prioritization of variants with CADA",
     entry_points={"console_scripts": ["cada-prio=cada_prio.cli:cli"]},
     install_requires=install_requirements,
+    extras_require={
+        "param-tuning": tune_requirements,
+    },
     license="MIT license",
     long_description=readme + "\n\n" + history,
     long_description_content_type="text/markdown",

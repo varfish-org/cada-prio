@@ -229,6 +229,16 @@ class EmbeddingParams:
     seed_fit: int = 1
 
 
+def log_graph_examples(edges: typing.List[Edge]):
+    edges = list(sorted(edges))
+    all_nodes = set(itertools.chain([e[0] for e in edges], [e[1] for e in edges]))
+    hgnc_nodes = list(sorted([v for v in all_nodes if v.startswith("HGNC:")]))
+    hpo_nodes = list(sorted([v for v in all_nodes if v.startswith("HP:")]))
+    logger.info("   - ten HGNC nodes: %s", hgnc_nodes[:10])
+    logger.info("   - ten HPO nodes: %s", hpo_nodes[:10])
+
+
+
 def build_and_fit_model(
     *,
     clinvar_gen2phen,
@@ -247,6 +257,7 @@ def build_and_fit_model(
             yield_gene2phen_edges(clinvar_gen2phen),
         )
     )
+    log_graph_examples(training_edges)
     logger.info("- graph construction")
     training_graph = nx.Graph()
     training_graph.add_edges_from(training_edges)
