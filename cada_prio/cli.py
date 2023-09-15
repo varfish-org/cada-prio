@@ -1,12 +1,18 @@
 """Console script for CADA"""
 
 import logging
+import os
+import sys
 import typing
 
 import click
 import logzero
 
 from cada_prio import _version, inspection, param_opt, predict, train_model
+
+# Lower the update interval of tqdm to 5 seconds if stdout is not a TTY.
+if not sys.stdout.isatty():
+    os.environ["TQDM_MININTERVAL"] = "5"
 
 
 @click.group()
@@ -23,7 +29,7 @@ def cli(ctx: click.Context, verbose: bool):
         logzero.loglevel(logging.INFO)
 
 
-@cli.command("train-model")
+@cli.command("train")
 @click.argument("path_out", type=str)
 @click.option("--path-hgnc-json", type=str, help="path to HGNC JSON", required=True)
 @click.option(
@@ -41,7 +47,7 @@ def cli(ctx: click.Context, verbose: bool):
 )
 @click.option("--cpus", type=int, help="number of CPUs to use", default=1)
 @click.pass_context
-def cli_train_model(
+def cli_train(
     ctx: click.Context,
     path_out: str,
     path_hgnc_json: str,
@@ -105,7 +111,12 @@ def cli_predict(
         ctx.exit(1)
 
 
-@cli.command("dump-graph")
+@cli.group("utils")
+def cli_utils():
+    """utilities"""
+
+
+@cli_utils.command("dump-graph")
 @click.argument("path_graph", type=str)
 @click.argument("path_hgnc_info", type=str)
 @click.pass_context
@@ -119,7 +130,13 @@ def cli_dump_graph(
     inspection.dump_graph(path_graph, path_hgnc_info)
 
 
-@cli.command("param-opt")
+@cli.group("tune")
+def cli_tune():
+    """hyperparameter tuning"""
+
+
+@cli_tune.command("train-eval")
+@click.argument("path_out", type=str)
 @click.option("--path-hgnc-json", type=str, help="path to HGNC JSON", required=True)
 @click.option(
     "--path-hpo-genes-to-phenotype",
@@ -137,35 +154,52 @@ def cli_dump_graph(
 @click.option(
     "--fraction-links",
     type=float,
-    help="fraction of links to add to the graph",
-    required=True,
+    help="fraction of links to add to the graph (conflicts with --path-validation-links)",
+)
+@click.option(
+    "--path-validation-links",
+    type=str,
+    help="path to validation links JSONL (conflicts with --fraction-links)",
+)
+@click.option(
+    "--path-embedding-params", type=str, help="path to JSON file with embedding params; optional"
 )
 @click.option(
     "--seed",
     type=int,
     help="seed for random number generator",
-    default=1,
 )
 @click.option("--cpus", type=int, help="number of CPUs to use", default=1)
 @click.pass_context
 def cli_param_opt(
     ctx: click.Context,
+    path_out: str,
     path_hgnc_json: str,
     path_hpo_genes_to_phenotype: str,
     path_hpo_obo: str,
     path_clinvar_phenotype_links: str,
-    fraction_links: float,
-    seed: int,
+    fraction_links: typing.Optional[float],
+    path_validation_links: typing.Optional[str],
+    path_embedding_params: typing.Optional[str],
+    seed: typing.Optional[int],
     cpus: int,
 ):
-    """dump graph edges for debugging"""
+    """train and evaluate model for one set of parameters"""
+    if bool(fraction_links) == bool(path_validation_links):
+        raise click.UsageError(
+            "exactly one of --fraction-links and --path-validation-links must be given"
+        )
+
     ctx.ensure_object(dict)
-    param_opt.perform_parameter_optimization(
+    param_opt.train_and_validate(
+        path_out=path_out,
         path_hgnc_json=path_hgnc_json,
         path_hpo_genes_to_phenotype=path_hpo_genes_to_phenotype,
         path_hpo_obo=path_hpo_obo,
         path_clinvar_phenotype_links=path_clinvar_phenotype_links,
         fraction_links=fraction_links,
+        path_validation_links=path_validation_links,
+        path_embedding_params=path_embedding_params,
         seed=seed,
         cpus=cpus,
     )
