@@ -275,20 +275,12 @@ if HAVE_OPTUNA:
                 json.dump(
                     cattr.unstructure(
                         train_model.EmbeddingParams(
-                            # dimensions=trial.suggest_int("dimensions", low=100, high=500, step=10),
-                            # walk_length=trial.suggest_int("walk_length", low=1, high=100),
-                            # p=trial.suggest_float("p", low=0.1, high=2.5),
-                            # q=trial.suggest_float("q", low=0.0, high=1.0),
-                            # num_walks=trial.suggest_int("num_walks", low=10, high=50),
-                            # window=trial.suggest_int("window", low=4, high=8),
-                            # min_count=1,
-                            # batch_words=4,
-                            dimensions=100,
-                            walk_length=10,
-                            p=1.0,
-                            q=1.0,
-                            num_walks=10,
-                            window=4,
+                            dimensions=trial.suggest_int("dimensions", low=100, high=500, step=20),
+                            walk_length=trial.suggest_int("walk_length", low=1, high=100),
+                            p=trial.suggest_float("p", low=0.1, high=2.5),
+                            q=trial.suggest_float("q", low=0.0, high=1.0),
+                            num_walks=trial.suggest_int("num_walks", low=10, high=50),
+                            window=trial.suggest_int("window", low=4, high=8),
                             min_count=1,
                             batch_words=4,
                         )
@@ -312,5 +304,5 @@ if HAVE_OPTUNA:
                 return result[100]
 
         optuna.logging.get_logger("optuna").addHandler(logging.StreamHandler(sys.stdout))
-        study = optuna.load_study(study_name=study_name, storage=storage, load_if_exists=True)
+        study = optuna.load_study(study_name=study_name, storage=storage)
         study.optimize(objective, n_trials=n_trials)
