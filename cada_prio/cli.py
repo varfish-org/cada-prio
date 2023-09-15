@@ -21,10 +21,6 @@ except ImportError:
 
 from cada_prio import _version, inspection, param_opt, predict, train_model
 
-# Lower the update interval of tqdm to 5 seconds if stdout is not a TTY.
-if not sys.stdout.isatty():
-    os.environ["TQDM_MININTERVAL"] = "5"
-
 
 @click.group()
 @click.version_option(_version.__version__)

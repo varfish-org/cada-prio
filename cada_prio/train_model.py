@@ -238,7 +238,6 @@ def log_graph_examples(edges: typing.List[Edge]):
     logger.info("   - ten HPO nodes: %s", hpo_nodes[:10])
 
 
-
 def build_and_fit_model(
     *,
     clinvar_gen2phen,
