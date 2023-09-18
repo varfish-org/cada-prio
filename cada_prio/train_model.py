@@ -225,6 +225,10 @@ class EmbeddingParams:
     batch_words: int = 4
     #: RNG seed for embedding
     seed_embedding: int = 1
+    #: Whether to use skipgram for model fitting instead of CBOW
+    use_skipgram: bool = False
+    #: Number of epochs for fitting
+    epochs: int = 5
     #: RNG seed for fitting
     seed_fit: int = 1
 
@@ -287,6 +291,8 @@ def build_and_fit_model(
         min_count=embedding_params.min_count,
         batch_words=embedding_params.batch_words,
         seed=embedding_params.seed_fit,
+        sg=1 if embedding_params.use_skipgram else 0,
+        epochs=embedding_params.epochs,
         workers=cpus,
     )
     fit_elapsed = time.time() - fit_start
