@@ -274,12 +274,12 @@ if HAVE_OPTUNA:
                 json.dump(
                     cattr.unstructure(
                         train_model.EmbeddingParams(
-                            dimensions=trial.suggest_int("dimensions", low=100, high=500, step=20),
-                            walk_length=trial.suggest_int("walk_length", low=1, high=100),
+                            dimensions=trial.suggest_int("dimensions", low=100, high=1000, step=20),
+                            walk_length=trial.suggest_int("walk_length", low=1, high=200),
                             p=trial.suggest_float("p", low=0.1, high=2.5),
                             q=trial.suggest_float("q", low=0.0, high=1.0),
-                            num_walks=trial.suggest_int("num_walks", low=10, high=50),
-                            window=trial.suggest_int("window", low=4, high=8),
+                            num_walks=trial.suggest_int("num_walks", low=10, high=100),
+                            window=trial.suggest_int("window", low=4, high=16),
                             min_count=1,
                             batch_words=4,
                         )
