@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0](https://www.github.com/bihealth/cada-prio/compare/v0.4.0...v0.5.0) (2023-09-18)
+
+
+### Features
+
+* adding "tune run-optuna" command ([#23](https://www.github.com/bihealth/cada-prio/issues/23)) ([6cc753b](https://www.github.com/bihealth/cada-prio/commit/6cc753b3b4f92aa75d961c3cf314e097d174ede0))
+* re-useable implementation of "tune train-eval" ([#21](https://www.github.com/bihealth/cada-prio/issues/21)) ([c80c4bf](https://www.github.com/bihealth/cada-prio/commit/c80c4bf1d69ff83bcb84b949cf3383746580a12d))
+
 ## [0.4.0](https://www.github.com/bihealth/cada-prio/compare/v0.3.1...v0.4.0) (2023-09-14)
 
 
