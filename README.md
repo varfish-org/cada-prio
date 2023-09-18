@@ -12,6 +12,29 @@ This is a re-implementation of the [CADA](https://github.com/Chengyao-Peng/CADA)
 - Discussion Forum: https://github.com/bihealth/cada-prio/discussions
 - Bug Reports: https://github.com/bihealth/cada-prio/issues
 
+## Running Hyperparameter Tuning
+
+Install with `tune` feature enabled:
+
+```
+pip install cada-prio[tune]
+```
+
+Run tuning, e.g., on the "classic" model.
+Thanks to [optuna](https://optuna.org/), you can run this in parallel as long as the database is shared.
+Each run will use 4 CPUs in the example below and perform 1 trial.
+
+```
+cada-prio tune run-optuna \
+    sqlite:///local_data/cada-tune.sqlite \
+    --path-hgnc-json data/classic/hgnc_complete_set.json \
+    --path-hpo-genes-to-phenotype data/classic/genes_to_phenotype.all_source_all_freqs_etc.txt \
+    --path-hpo-obo data/classic/hp.obo \
+    --path-clinvar-phenotype-links data/classic/cases_train.jsonl \
+    --path-validation-links data/classic/cases_validate.jsonl \
+    --n-trials 1 \
+    --cpus=4
+```
 
 ## Managing GitHub Project with Terraform
 

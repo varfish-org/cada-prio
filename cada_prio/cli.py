@@ -1,18 +1,24 @@
 """Console script for CADA"""
 
+import json
 import logging
-import os
 import sys
+import tempfile
 import typing
 
+import cattr
 import click
 import logzero
 
-from cada_prio import _version, inspection, param_opt, predict, train_model
+try:
+    import optuna
 
-# Lower the update interval of tqdm to 5 seconds if stdout is not a TTY.
-if not sys.stdout.isatty():
-    os.environ["TQDM_MININTERVAL"] = "5"
+    _ = optuna
+    HAVE_OPTUNA = True
+except ImportError:
+    HAVE_OPTUNA = False
+
+from cada_prio import _version, inspection, param_opt, predict, train_model
 
 
 @click.group()
@@ -117,6 +123,9 @@ def cli_utils():
 
 
 @cli_utils.command("dump-graph")
+@click.option(
+    "--hgnc-to-entrez/--no-hgnc-to-entrez", help="enable HGNC to Entrez mapping", default=True
+)
 @click.argument("path_graph", type=str)
 @click.argument("path_hgnc_info", type=str)
 @click.pass_context
@@ -124,10 +133,11 @@ def cli_dump_graph(
     ctx: click.Context,
     path_graph: str,
     path_hgnc_info: str,
+    hgnc_to_entrez: bool,
 ):
     """dump graph edges for debugging"""
     ctx.ensure_object(dict)
-    inspection.dump_graph(path_graph, path_hgnc_info)
+    inspection.dump_graph(path_graph, path_hgnc_info, hgnc_to_entrez)
 
 
 @cli.group("tune")
@@ -171,7 +181,7 @@ def cli_tune():
 )
 @click.option("--cpus", type=int, help="number of CPUs to use", default=1)
 @click.pass_context
-def cli_param_opt(
+def cli_train_eval(
     ctx: click.Context,
     path_out: str,
     path_hgnc_json: str,
@@ -203,3 +213,101 @@ def cli_param_opt(
         seed=seed,
         cpus=cpus,
     )
+
+
+if HAVE_OPTUNA:
+
+    @cli_tune.command("run-optuna")
+    @click.argument("storage", type=str)
+    @click.option("--n-trials", type=int, help="number of trials to run; default: 100", default=100)
+    @click.option(
+        "--study-name",
+        type=str,
+        help="name of Optuna study; default: cada-tune",
+        default="cada-tune",
+    )
+    @click.option("--path-hgnc-json", type=str, help="path to HGNC JSON", required=True)
+    @click.option(
+        "--path-hpo-genes-to-phenotype",
+        type=str,
+        help="path to genes_to_phenotype.txt file",
+        required=True,
+    )
+    @click.option("--path-hpo-obo", type=str, help="path HPO OBO file", required=True)
+    @click.option(
+        "--path-clinvar-phenotype-links",
+        type=str,
+        help="path to ClinVar phenotype links JSONL",
+        required=True,
+    )
+    @click.option(
+        "--fraction-links",
+        type=float,
+        help="fraction of links to add to the graph (conflicts with --path-validation-links)",
+    )
+    @click.option(
+        "--path-validation-links",
+        type=str,
+        help="path to validation links JSONL (conflicts with --fraction-links)",
+    )
+    @click.option(
+        "--seed",
+        type=int,
+        help="seed for random number generator",
+    )
+    @click.option("--cpus", type=int, help="number of CPUs to use", default=1)
+    def cli_run_optuna(
+        storage: str,
+        study_name: str,
+        n_trials: int,
+        path_hgnc_json: str,
+        path_hpo_genes_to_phenotype: str,
+        path_hpo_obo: str,
+        path_clinvar_phenotype_links: str,
+        fraction_links: typing.Optional[float],
+        path_validation_links: typing.Optional[str],
+        seed: typing.Optional[int],
+        cpus: int,
+    ):
+        """run hyperparameter tuning"""
+
+        def objective(trial: optuna.trial.BaseTrial) -> float:
+            with tempfile.TemporaryDirectory() as tmpdir, open(
+                f"{tmpdir}/params.json", "wt"
+            ) as tmpf:
+                json.dump(
+                    cattr.unstructure(
+                        train_model.EmbeddingParams(
+                            dimensions=trial.suggest_int("dimensions", low=100, high=500, step=10),
+                            walk_length=trial.suggest_int("walk_length", low=1, high=100),
+                            p=trial.suggest_float("p", low=0.1, high=2.5),
+                            q=trial.suggest_float("q", low=0.0, high=1.0),
+                            num_walks=trial.suggest_int("num_walks", low=10, high=50),
+                            window=trial.suggest_int("window", low=4, high=8),
+                            epochs=trial.suggest_int("epochs", low=3, high=6),
+                            use_skipgram=trial.suggest_categorical("use_skipgram", [True, False]),
+                            min_count=trial.suggest_int("batch_words", low=1, high=5),
+                            batch_words=trial.suggest_int("batch_words", low=3, high=6),
+                        )
+                    ),
+                    tmpf,
+                    indent=2,
+                )
+                tmpf.flush()
+                result = param_opt.train_and_validate(
+                    path_out=f"{tmpdir}/out",
+                    path_hgnc_json=path_hgnc_json,
+                    path_hpo_genes_to_phenotype=path_hpo_genes_to_phenotype,
+                    path_hpo_obo=path_hpo_obo,
+                    path_clinvar_phenotype_links=path_clinvar_phenotype_links,
+                    fraction_links=fraction_links,
+                    path_validation_links=path_validation_links,
+                    path_embedding_params=f"{tmpdir}/params.json",
+                    seed=seed,
+                    cpus=cpus,
+                )
+                return result[100]
+
+        optuna.logging.get_logger("optuna").addHandler(logging.StreamHandler(sys.stdout))
+        study = optuna.create_study(study_name=study_name, storage=storage, load_if_exists=True)
+        study.optimize(objective, n_trials=n_trials)

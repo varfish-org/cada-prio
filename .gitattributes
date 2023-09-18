@@ -1,2 +1,2 @@
 tests/data/** filter=lfs diff=lfs merge=lfs -text
-data/param_opt/* filter=lfs diff=lfs merge=lfs -text
+data/** filter=lfs diff=lfs merge=lfs -text
