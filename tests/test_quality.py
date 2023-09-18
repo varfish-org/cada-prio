@@ -2,6 +2,7 @@
 
 from cada_prio import param_opt
 
+
 def test_quality(tmpdir):
     """Test quality of model built from 'classic' data from the original paper."""
     result = param_opt.train_and_validate(
