@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0](https://www.github.com/bihealth/cada-prio/compare/v0.5.0...v0.6.0) (2023-11-16)
+
+
+### Features
+
+* adding API prefix, OpenAPI and docs to REST server ([#35](https://www.github.com/bihealth/cada-prio/issues/35)) ([1a2f605](https://www.github.com/bihealth/cada-prio/commit/1a2f605bbaa28ed511b117efa04de256dcff149d))
+* adding classic and current model ([#25](https://www.github.com/bihealth/cada-prio/issues/25)) ([44ddf24](https://www.github.com/bihealth/cada-prio/commit/44ddf24abf939eed8ad56b80cb1e90f60846a390))
+
 ## [0.5.0](https://www.github.com/bihealth/cada-prio/compare/v0.4.0...v0.5.0) (2023-09-18)
 
 
