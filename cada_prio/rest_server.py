@@ -1,15 +1,18 @@
 """REST API for CADA using FastAPI."""
+
 from contextlib import asynccontextmanager
 import os
 import typing
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Query
+from logzero import logger
 from pydantic import BaseModel
 from starlette.responses import Response
 
 import cada_prio
 from cada_prio import predict
+from cada_prio._version import __version__
 
 # Load environment
 env = os.environ
@@ -25,6 +28,9 @@ PATH_LEGACY = env.get("CADA_PATH_LEGACY", None)
 #: The CADA models, to be loaded on startup.
 GLOBAL_STATIC = {}
 
+#: V1 API prefix.
+API_V1_STR = "/api/v1"
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -38,16 +44,28 @@ async def lifespan(app: FastAPI):
     GLOBAL_STATIC["graph"] = graph
     GLOBAL_STATIC["model"] = model
 
+    logger.info("see /api/v1/docs for docs")
+    logger.info(
+        "try: /api/v1/predict?hpo_terms=HP:0000098,HP:0000218,HP:0000486&genes=FBN1,TTN,BRCA1"
+    )
+
     yield
 
     GLOBAL_STATIC.clear()
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title="cada-prio",
+    description="A phenotype-based gene prioritization tool.",
+    version=__version__,
+    lifespan=lifespan,
+    openapi_url=f"{API_V1_STR}/openapi.json",
+    docs_url=f"{API_V1_STR}/docs",
+)
 
 
 # Register endpoint for returning CADA version.
-@app.get("/version")
+@app.get("/api/v1/version")
 async def version():
     return Response(content=cada_prio.__version__)
 
@@ -61,11 +79,12 @@ class PredictionResult(BaseModel):
 
 
 # Register endpoint for the prediction
-@app.get("/predict")
+@app.get("/api/v1/predict")
 async def handle_predict(
-    hpo_terms: typing.Annotated[str, Query()],
-    genes: typing.Annotated[typing.Optional[str], Query()] = None,
+    hpo_terms: typing.Annotated[str, Query(example="HP:0000098,HP:0000218,HP:0000486")],
+    genes: typing.Annotated[typing.Optional[str], Query(example="FBN1,TTN,BRCA1")] = None,
 ):
+    """Predict genes for a given set of HPO terms and optionally genes."""
     hpo_terms_list = hpo_terms.split(",")
     genes_list = genes.split(",") if genes else None
     _, sorted_scores = predict.run_prediction(
