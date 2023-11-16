@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.6.1](https://www.github.com/bihealth/cada-prio/compare/v0.6.0...v0.6.1) (2023-11-16)
+
+
+### Bug Fixes
+
+* pinning python to 3.11 for build so we have setuptools ([#36](https://www.github.com/bihealth/cada-prio/issues/36)) ([54d4e8c](https://www.github.com/bihealth/cada-prio/commit/54d4e8c4be8bdd7ad6b9f839b22a798b5f527d27))
+
 ## [0.6.0](https://www.github.com/bihealth/cada-prio/compare/v0.5.0...v0.6.0) (2023-11-16)
 
 
