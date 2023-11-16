@@ -75,9 +75,9 @@ def load_links(
     else:
         logger.info("Computing counts...")
         n_links_total = len(phenotype_links)
-        n_links_used = int(fraction_links * n_links_total)
-        n_links_training = int(n_links_used * 0.6)
-        n_links_validation = (n_links_used - n_links_training) // 2
+        n_links_training_all = int(0.6 * n_links_total)
+        n_links_training = int(n_links_training_all * fraction_links)
+        n_links_validation = (n_links_total - n_links_training_all) // 2
         n_links_test = n_links_validation
         links_training = phenotype_links[:n_links_training]
         links_validation = phenotype_links[n_links_training : n_links_training + n_links_validation]
@@ -87,11 +87,11 @@ def load_links(
             + n_links_validation
             + n_links_test
         ]
-        logger.info("- total:      % 6d", len(phenotype_links))
-        logger.info("- used:       % 6d", n_links_used)
-        logger.info("- training:   % 6d", len(links_training))
-        logger.info("- validation: % 6d", len(links_validation))
-        logger.info("- test:       % 6d", len(links_test))
+        logger.info("- total:        % 6d", len(phenotype_links))
+        logger.info("- training-all: % 6d", n_links_training_all)
+        logger.info("- training:     % 6d", len(links_training))
+        logger.info("- validation:   % 6d", len(links_validation))
+        logger.info("- test:         % 6d", len(links_test))
         logger.info("... done computing counts")
 
     return links_training, links_validation, links_test
@@ -242,7 +242,10 @@ def run_validation(
             if rank <= no:
                 links_top[no] += 1
 
-    result = {no: 100.0 * count / links_total for no, count in links_top.items()}
+    result = {
+        no: 100.0 * count / links_total if links_total > 0 else 0.0
+        for no, count in links_top.items()
+    }
     logger.info("<result>")
     print(json.dumps(result, indent=2))
     logger.info("</result>")

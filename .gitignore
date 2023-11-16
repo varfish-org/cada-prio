@@ -1,3 +1,7 @@
+/_*
+/legacy-model
+/venv
+/Pipfile*
 /local_data
 
 *~

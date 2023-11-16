@@ -2,6 +2,7 @@
 
 import json
 import logging
+import os
 import sys
 import tempfile
 import typing
@@ -123,9 +124,6 @@ def cli_utils():
 
 
 @cli_utils.command("dump-graph")
-@click.option(
-    "--hgnc-to-entrez/--no-hgnc-to-entrez", help="enable HGNC to Entrez mapping", default=True
-)
 @click.argument("path_graph", type=str)
 @click.argument("path_hgnc_info", type=str)
 @click.pass_context
@@ -133,11 +131,10 @@ def cli_dump_graph(
     ctx: click.Context,
     path_graph: str,
     path_hgnc_info: str,
-    hgnc_to_entrez: bool,
 ):
     """dump graph edges for debugging"""
     ctx.ensure_object(dict)
-    inspection.dump_graph(path_graph, path_hgnc_info, hgnc_to_entrez)
+    inspection.dump_graph(path_graph, path_hgnc_info)
 
 
 @cli.group("tune")
@@ -215,26 +212,6 @@ def cli_train_eval(
     )
 
 
-@cli_tune.command("eval-only")
-@click.argument("path_model", type=str)
-@click.argument(
-    "path_validation_links",
-    type=str,
-)
-@click.pass_context
-def cli_eval_only(
-    ctx: click.Context,
-    path_model: str,
-    path_validation_links: str,
-):
-    """run a trained model on validation links"""
-    ctx.ensure_object(dict)
-    param_opt.run_validation(
-        path_out=path_model,
-        path_links_validation=path_validation_links,
-    )
-
-
 if HAVE_OPTUNA:
 
     @cli_tune.command("run-optuna")
@@ -298,16 +275,14 @@ if HAVE_OPTUNA:
                 json.dump(
                     cattr.unstructure(
                         train_model.EmbeddingParams(
-                            dimensions=trial.suggest_int("dimensions", low=100, high=500, step=10),
+                            dimensions=trial.suggest_int("dimensions", low=100, high=500, step=20),
                             walk_length=trial.suggest_int("walk_length", low=1, high=100),
                             p=trial.suggest_float("p", low=0.1, high=2.5),
                             q=trial.suggest_float("q", low=0.0, high=1.0),
                             num_walks=trial.suggest_int("num_walks", low=10, high=50),
                             window=trial.suggest_int("window", low=4, high=8),
-                            epochs=trial.suggest_int("epochs", low=3, high=6),
-                            use_skipgram=trial.suggest_categorical("use_skipgram", [True, False]),
-                            min_count=trial.suggest_int("min_count", low=1, high=5),
-                            batch_words=trial.suggest_int("batch_words", low=3, high=6),
+                            min_count=1,
+                            batch_words=4,
                         )
                     ),
                     tmpf,
@@ -329,5 +304,7 @@ if HAVE_OPTUNA:
                 return result[100]
 
         optuna.logging.get_logger("optuna").addHandler(logging.StreamHandler(sys.stdout))
-        study = optuna.create_study(study_name=study_name, storage=storage, load_if_exists=True)
-        study.optimize(objective, n_trials=n_trials)
+        study = optuna.create_study(
+            study_name=study_name, storage=storage, load_if_exists=True, direction="maximize"
+        )
+        study.optimize(objective, n_trials=n_trials, gc_after_trial=True)
