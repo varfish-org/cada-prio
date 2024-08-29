@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://www.github.com/varfish-org/cada-prio/compare/v0.6.1...v0.7.0) (2024-08-29)
+
+
+### Features
+
+* command to dump OpenAPI schema ([#58](https://www.github.com/varfish-org/cada-prio/issues/58)) ([#59](https://www.github.com/varfish-org/cada-prio/issues/59)) ([317a767](https://www.github.com/varfish-org/cada-prio/commit/317a7674002543720084d4e5532db4cc7dc456e5))
+
 ### [0.6.1](https://www.github.com/bihealth/cada-prio/compare/v0.6.0...v0.6.1) (2023-11-16)
 
 
