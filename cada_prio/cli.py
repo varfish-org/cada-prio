@@ -9,6 +9,7 @@ import typing
 import cattr
 import click
 import logzero
+import yaml
 
 try:
     import optuna
@@ -138,6 +139,16 @@ def cli_dump_graph(
     """dump graph edges for debugging"""
     ctx.ensure_object(dict)
     inspection.dump_graph(path_graph, path_hgnc_info, hgnc_to_entrez)
+
+
+@cli_utils.command("dump-openapi-yaml")
+@click.argument("path_out", type=str)
+def cli_dump_openapi_yaml(path_out: str):
+    """Dump OpenAPI YAML file"""
+    from cada_prio import rest_server
+
+    with open(path_out, "wt") as f:
+        yaml.dump(rest_server.app.openapi(), f)
 
 
 @cli.group("tune")
