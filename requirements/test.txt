@@ -1,7 +1,7 @@
 -r tune.txt
 -r base.txt
 
-black ==24.10.0
+black ==25.1.0
 isort >=5.10.1, <6.0
 flake8 >=5.0.4, <8.0
 pytest
