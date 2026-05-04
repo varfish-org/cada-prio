@@ -3,7 +3,7 @@
 
 black ==25.11.0
 isort >=5.10.1, <7.0
-flake8 >=5.0.4, <8.0
+flake8 >=7.3.0, <8.0
 pytest
 pytest-cov
 pytest-snapshot
