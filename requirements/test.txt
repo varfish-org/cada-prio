@@ -11,7 +11,7 @@ pytest-asyncio
 httpx >=0.28.1, <0.29
 
 mypy ==1.19.1
-types-python-dateutil >=2.8.19.3
+types-python-dateutil >=2.9.0.20260124
 types-requests >=2.32.4.20260107, <3.0
 types-click >=7.1.8, <9.0
 types-toml >=0.10.8.20240310, <0.11
