@@ -3,7 +3,7 @@ attrs >=22.1.0, <27.0
 cattrs >=25.3.0, <26.0
 click >=8.1.8, <9.0
 toml >=0.10.2, <0.11
-tqdm >=4.0
+tqdm >=4.67.3
 pronto >=2.7.3, <3.0
 networkx
 node2vec >=0.4.6, <0.6
